@@ -1,12 +1,12 @@
-import logger from "@/utils/logger"
+import logger from "../utils/logger"
 import * as swc from "@swc/wasm-web"
 import type { Options } from "@swc/wasm-web"
 
 const SWC_COMPILER_CONFIG: Options = {
   jsc: {
     parser: {
-      syntax: "ecmascript",
-      jsx: true,
+      syntax: "typescript",
+      tsx: true,
     },
     target: "es2016",
     loose: false,

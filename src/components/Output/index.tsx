@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react"
+import React,{ useCallback, useEffect, useMemo, useState } from "react"
 
-import CodeMirror from "@/components/Editor/CodeMirror"
-import { type OutputCode, transformCode } from "@/hooks/swc"
-import { useReplStore } from "@/store"
-import Tabs from "@/components/Tabs"
+import CodeMirror from "../../components/Editor/CodeMirror"
+import { type OutputCode, transformCode } from "../../hooks/swc"
+import { useReplStore } from "../../store"
+import Tabs from "../Tabs"
 
 import Preview from "./Preview"
 import "./styles.css"
@@ -17,6 +17,7 @@ const outputTabs = [
 const Output = () => {
   const { state } = useReplStore()
   const { code = "", builtinImportMap, showAST, showCompile } = state
+
   const [activeTab, setActiveTab] =
     useState<(typeof outputTabs)[number]["value"]>("preview")
 

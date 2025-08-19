@@ -1,4 +1,4 @@
-import template from "@/template/hello.tsx?raw"
+import template from "./template/hello.tsx?raw"
 import type { CompletionSource } from "@codemirror/autocomplete"
 import type { Extension } from "@codemirror/state"
 import { type Dispatch, createContext, useContext } from "react"
@@ -73,7 +73,6 @@ export interface ReplState extends ReplProps {
     }
   }
 }
-
 export const DEFAULT_REPL_STATE: ReplState = {
   showCompile: true,
   showAST: true,

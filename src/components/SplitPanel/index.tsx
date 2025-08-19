@@ -1,5 +1,4 @@
-import type React from "react"
-import { useCallback, useRef, useState } from "react"
+import React,{ useCallback, useRef, useState } from "react"
 import "./styles.css"
 
 interface SplitPaneProps {

@@ -1,5 +1,5 @@
 import type { FC } from "react"
-
+import React from 'react'
 import EditorContainer from "./components/Editor"
 import Output from "./components/Output"
 import SplitPane from "./components/SplitPanel"

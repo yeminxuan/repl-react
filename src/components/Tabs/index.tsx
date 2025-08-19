@@ -1,5 +1,5 @@
 import "./styles.css"
-
+import React from "react"
 interface Tab {
   label: string
   value: string

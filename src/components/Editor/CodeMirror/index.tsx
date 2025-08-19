@@ -2,7 +2,7 @@ import { type CompletionSource, autocompletion } from "@codemirror/autocomplete"
 import { javascript } from "@codemirror/lang-javascript"
 import { EditorState, type Extension } from "@codemirror/state"
 import { EditorView, basicSetup } from "codemirror"
-import { type FC, useEffect, useLayoutEffect, useRef } from "react"
+import React,{ type FC, useEffect, useLayoutEffect, useRef } from "react"
 
 import { replJSXCompletion } from "./autocompletion"
 import { vitesse } from "./theme"

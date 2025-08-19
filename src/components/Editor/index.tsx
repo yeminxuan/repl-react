@@ -1,5 +1,6 @@
-import { useReplStore } from "@/store"
-import { useCallback, useMemo, useState } from "react"
+
+import { useReplStore } from "../../store"
+import React, { useCallback, useMemo, useState } from "react"
 
 import Tabs from "../Tabs"
 import CodeMirror from "./CodeMirror"

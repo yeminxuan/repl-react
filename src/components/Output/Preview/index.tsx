@@ -1,11 +1,10 @@
-import type React from "react"
-import { useCallback, useEffect, useRef } from "react"
+import React,{ useCallback, useEffect, useRef } from "react"
 
-import logger from "@/utils/logger"
+import logger from "../../../utils/logger"
 import basicTemplate from "./basic.html?raw"
 
 import "./styles.css"
-import { useImportMap } from "@/hooks/impormap"
+import { useImportMap } from "../../../hooks/impormap"
 
 interface Props {
   className?: string
