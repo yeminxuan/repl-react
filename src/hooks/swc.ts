@@ -1,5 +1,5 @@
 import logger from "../utils/logger";
-import initSync,{ transformSync } from "@swc/wasm-web";
+import initSync,{ transformSync,parseSync} from "@swc/wasm-web";
 import type { Options} from "@swc/wasm-web";
 import wasmUrl from '@swc/wasm-web/wasm_bg.wasm?url';
 const SWC_COMPILER_CONFIG: Options = {
@@ -118,11 +118,9 @@ export async function transformCode(code: string): Promise<OutputCode> {
     }
     
     const transformedCode = transformSync(code, SWC_PREVIEW_CONFIG).code;
-
     const compiledCode = transformSync(code, SWC_COMPILER_CONFIG).code;
+    const ast =  JSON.stringify(await parse(code), null, 2)
     
-    const ast = code
-
     return {
       transformedCode,
       compiledCode,
@@ -140,12 +138,11 @@ export async function parse(code: string) {
     if (!instance) {
       throw new Error("SWC instance not initialized");
     }
-    const AST = instance.parseSync(code, {
-      syntax: "ecmascript",
-      jsx: true,
-      target: "es2016",
+    const AST = parseSync(code, {
+      syntax: 'typescript',
+      tsx: true,
+      target: 'es2022',
     })
-
     return AST;
   } catch (error) {
     logger.error("Parse error:", error);
