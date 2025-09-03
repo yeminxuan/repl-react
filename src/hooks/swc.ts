@@ -1,7 +1,7 @@
-import logger from "../utils/logger"
-import * as swc from "@swc/wasm-web"
-import type { Options } from "@swc/wasm-web"
-
+import logger from "../utils/logger";
+import initSync,{ transformSync } from "@swc/wasm-web";
+import type { Options} from "@swc/wasm-web";
+import wasmUrl from '@swc/wasm-web/wasm_bg.wasm?url';
 const SWC_COMPILER_CONFIG: Options = {
   jsc: {
     parser: {
@@ -20,7 +20,7 @@ const SWC_COMPILER_CONFIG: Options = {
   },
   minify: false,
   isModule: true,
-}
+};
 
 const SWC_PREVIEW_CONFIG: Options = {
   jsc: {
@@ -89,79 +89,66 @@ const SWC_PREVIEW_CONFIG: Options = {
   },
   minify: true,
   isModule: true,
-}
+};
 
-let swcInstance: typeof swc | null = null
-let initPromise: Promise<void> | null = null
+let swcInstance: any = null;
+let initPromise: Promise<void>;
 
 export interface OutputCode {
-  transformedCode: string
-  compiledCode: string
-  ast: string
+  transformedCode: string;
+  compiledCode: string;
+  ast: string;
 }
 
 export async function initSwcModule() {
   if (!initPromise) {
     initPromise = (async () => {
-      try {
-        const wasmUrl = new URL("@swc/wasm-web/wasm_bg.wasm", import.meta.url)
-        await swc.default({
-          url: wasmUrl,
-        })
-        swcInstance = swc
-        logger.log("SWC initialized successfully")
-      } catch (error) {
-        logger.error("Failed to initialize SWC:", error)
-        initPromise = null
-        throw error
-      }
-    })()
+      swcInstance = initSync(wasmUrl)
+    })();
   }
-  await initPromise
-  return swcInstance
+  await initPromise;
+  return swcInstance;
 }
 
 export async function transformCode(code: string): Promise<OutputCode> {
   try {
-    const instance = await initSwcModule()
+    const instance = await initSwcModule();
     if (!instance) {
-      throw new Error("SWC instance not initialized")
+      throw new Error("SWC instance not initialized");
     }
+    
+    const transformedCode = transformSync(code, SWC_PREVIEW_CONFIG).code;
 
-    const transformedCode = instance.transformSync(
-      code,
-      SWC_PREVIEW_CONFIG,
-    ).code
-    const compiledCode = instance.transformSync(code, SWC_COMPILER_CONFIG).code
-    const ast = JSON.stringify(await parse(code), null, 2)
+    const compiledCode = transformSync(code, SWC_COMPILER_CONFIG).code;
+    
+    const ast = code
 
     return {
       transformedCode,
       compiledCode,
       ast,
-    }
+    };
   } catch (error) {
-    logger.error("Transform error:", error)
-    throw error
+    logger.error("Transform error:", error);
+    throw error;
   }
 }
 
 export async function parse(code: string) {
   try {
-    const instance = await initSwcModule()
+    const instance = await initSwcModule();
     if (!instance) {
-      throw new Error("SWC instance not initialized")
+      throw new Error("SWC instance not initialized");
     }
-
     const AST = instance.parseSync(code, {
       syntax: "ecmascript",
       jsx: true,
       target: "es2016",
     })
 
-    return AST
+    return AST;
   } catch (error) {
-    logger.error("Parse error:", error)
-    throw error
+    logger.error("Parse error:", error);
+    throw error;
   }
 }

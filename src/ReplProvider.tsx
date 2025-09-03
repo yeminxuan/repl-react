@@ -1,4 +1,4 @@
-import { type FC, type PropsWithChildren, useEffect, useState } from "react"
+import React, { type FC, type PropsWithChildren, useEffect, useState } from "react"
 import { useImportMap } from "./hooks/impormap"
 import {
   DEFAULT_REPL_STATE,
@@ -6,8 +6,7 @@ import {
   type ReplProps,
   type ReplState,
 } from "./store"
-import { debounce, deserialize, serialize } from "./utils"
-import logger from "./utils/logger"
+import { debounce,serialize } from "./utils"
 
 const THEME = "data-repl-theme"
 
@@ -22,7 +21,7 @@ export const ReplProvider: FC<Props> = ({ children, config = {} }) => {
   }
 
   const [state, setState] = useState<ReplState>(value)
-
+  
   const onChangeCode = debounce((code: string) => {
     setState((preValue) => {
       history.replaceState(
@@ -51,27 +50,16 @@ export const ReplProvider: FC<Props> = ({ children, config = {} }) => {
         builtinImportMap: importMap,
       }
     })
+   
   }, 300)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    try {
-      const { root: code, importMap } = deserialize(location.hash)
-
-      setState({
-        ...state,
-        code,
-        builtinImportMap: importMap || JSON.stringify(useImportMap(), null, 2),
-      })
-    } catch (error) {
-      logger.error("Hash deserialization error", error)
-
-      setState({
+    setState({
         ...state,
         code: state.defaultCode,
         builtinImportMap: JSON.stringify(useImportMap(), null, 2),
-      })
-    }
+      });
   }, [])
 
   useEffect(() => {
