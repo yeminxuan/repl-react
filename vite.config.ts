@@ -1,11 +1,8 @@
 import fs from "node:fs"
-import path, { resolve } from "node:path"
-import react from "@vitejs/plugin-react"
+import path from "node:path"
 import { type Plugin, mergeConfig } from "vite"
-import dts from "vite-plugin-dts"
-
 import baseConfig from "./vite.preview.config"
-
+import dts from 'vite-plugin-dts'
 /**
  * Patch generated entries and import their corresponding CSS files.
  */
@@ -14,7 +11,7 @@ const patchCssFiles: Plugin = {
   apply: "build",
   writeBundle() {
     //  inject css imports to the files
-    const outDir = path.resolve("build")
+    const outDir = path.resolve("dist")
     ;["repl-react", "codemirror-editor"].forEach((file) => {
       const filePath = path.resolve(outDir, `${file}.js`)
       const content = fs.readFileSync(filePath, "utf-8")
@@ -22,34 +19,24 @@ const patchCssFiles: Plugin = {
     })
   },
 }
-
-// https://vite.dev/config/
 export default mergeConfig(baseConfig, {
   plugins: [
-    react(),
     dts({
       rollupTypes: true,
-      insertTypesEntry: true,
-      entryRoot: "src",
-      exclude: ["**/*.test.ts", "**/*.test.tsx"],
     }),
-    patchCssFiles,
+    patchCssFiles
   ],
-  resolve: {
-    alias: {
-      "@": resolve(__dirname, "src"),
-    },
-  },
   optimizeDeps: {
-    exclude: ["typescript"],
+    include: [
+      'typescript'
+    ],
+    exclude: [
+      '@swc/wasm-web'
+    ]
   },
-  server: {
-    headers: {
-      "*.wasm": ["application/wasm"],
-    },
-  },
+  base: './',
   build: {
-    outDir: "build",
+    outDir: 'dist',
     target: "esnext",
     minify: false,
     lib: {
@@ -60,10 +47,17 @@ export default mergeConfig(baseConfig, {
       formats: ["es"],
       fileName: () => "[name].js",
     },
+    cssCodeSplit: true,
     rollupOptions: {
       external: ["react", "react-dom"],
       output: {
         chunkFileNames: "chunks/[name]-[hash].js",
+        manualChunks(id:string) {
+          // id 中包含 codemirror-editor 的 style.css
+          if (id.includes('CodeMirror') && id.endsWith('.css')) {
+            return "codemirror-editor.css";  // 不打公共 chunk，独立输出
+          }
+        },
       },
     },
   },
